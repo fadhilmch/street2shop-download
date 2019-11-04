@@ -33,9 +33,6 @@ def main(args):
         except:
             print("Unexpected error:", sys.exc_info()[0])
             logging.error(sys.exc_info()[0])
-
-        if i % 200 == 0:
-            print('Downloaded ' + str(i) + 'images')
     
     # Download images for each class
     def read_class(class_name, max_num_samples, url_dict, images_dir):
