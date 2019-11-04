@@ -1,38 +1,27 @@
 from tomorrow import threads
-import imghdr
-import requests
 import os
-from itertools import islice
 import sys
 import logging
 import urllib.request
 import json
 
-
-# def split(x):
-#     first = x.find(',')
-#     return (x[:first], x[first+1:])
-
-        
-
     
 def main(args):
-    print(args)
     
     # Run the download function on multi-threads
     @threads(args.threads)
-    def download(item_id, url, i, images_dir):
+    def download(item_id, url, images_dir):
         if not os.path.exists(images_dir):
             os.makedirs(images_dir)
         try:
             file_output = os.path.join(images_dir, str(item_id) + '.' + 'JPEG')
             urllib.request.urlretrieve(url, file_output)
             print(file_output)
-        except KeyboardException:
-            raise
+            return 1
         except:
             print("Unexpected error:", sys.exc_info()[0])
             logging.error(sys.exc_info()[0])
+            return 0
     
     # Download images for each class
     def read_class(class_name, max_num_samples, url_dict, images_dir):
@@ -48,8 +37,8 @@ def main(args):
             photo_id = int(data['photo'])
             url = url_dict[photo_id]
             output_dir = os.path.join(images_dir, class_name)
-            download(photo_id, url, i, output_dir)
-        print('Downloaded ' + str(i) + ' images for class ' + class_name)
+            download(photo_id, url, output_dir)
+        print('Downloaded ' + str(len(next(os.walk(output_dir))[2])) + ' images for class ' + class_name)
     
     print('Start downloading images from Street2Shop dataset...')
     
@@ -65,13 +54,14 @@ def main(args):
     # Check whether we want to download all images or for specified class only
     if(args.classes[0] == 'all'):
         print('Downloading all images...')
-        for i,(item_id, url) in enumerate(url_dict.items()):
-            download(item_id, url, i, args.images_dir)
-        print('Downloaded ' + str(i) + ' images')
+        for i, (item_id, url) in enumerate(url_dict.items()):
+            if i >= args.max_num_samples:
+                break
+            download(item_id, url, args.images_dir)
+        print('Downloaded ' + str(len(next(os.walk(args.images_dir))[2])) + ' images')
     else:
-        for i, class_name in enumerate(args.classes):
+        for class_name in args.classes:
             read_class(class_name, args.max_num_samples, url_dict, args.images_dir)
-
 
 if __name__ == '__main__':
     from argparse import ArgumentParser
@@ -88,6 +78,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     main(args)
-
+    
+    print('Finished')
+    
     exit(0)
     
