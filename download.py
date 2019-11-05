@@ -86,7 +86,6 @@ if __name__ == '__main__':
     parser.add_argument('--urls', dest='urls', type=str, default=None, required=True, help='urls file')
     parser.add_argument('--image_dir', dest='images_dir', type=str, default='images', help='image directory')
     parser.add_argument('--log', dest='log', type=str, default=None, help='log errors')
-    parser.add_argument('--start', dest='start', type=int, default=0, help='start offset')
     parser.add_argument('--threads', dest='threads', type=int, default=10, help='threads')
     parser.add_argument('--classes', nargs='+', dest='classes', type=str, default=['all'], help='specific fashion classes to download')
     parser.add_argument('--max_num_samples', dest='max_num_samples', type=int, default=None, help='maximum number of samples')
