@@ -17,11 +17,9 @@ def main(args):
             file_output = os.path.join(images_dir, str(item_id) + '.' + 'JPEG')
             urllib.request.urlretrieve(url, file_output)
             print(file_output)
-            return 1
         except:
             print("Unexpected error:", sys.exc_info()[0])
             logging.error(sys.exc_info()[0])
-            return 0
     
     # Download images for each class
     def read_class(class_name, max_num_samples, url_dict, images_dir):
@@ -33,12 +31,12 @@ def main(args):
 
         for i,data in enumerate(meta_data):
             if i >= max_num_samples:
+#                 print('Downloaded ' + str(len(next(os.walk(output_dir))[2])) + ' images for class ' + class_name)
                 break
             photo_id = int(data['photo'])
             url = url_dict[photo_id]
             output_dir = os.path.join(images_dir, class_name)
             download(photo_id, url, output_dir)
-        print('Downloaded ' + str(len(next(os.walk(output_dir))[2])) + ' images for class ' + class_name)
     
     print('Start downloading images from Street2Shop dataset...')
     
@@ -55,10 +53,13 @@ def main(args):
     if(args.classes[0] == 'all'):
         print('Downloading all images...')
         for i, (item_id, url) in enumerate(url_dict.items()):
+            print(i)
             if i >= args.max_num_samples:
+#                 print(i,len(url_dict),args.max_num_samples)
+#                 print('Downloaded ' + str(len(next(os.walk(args.images_dir))[2])) + ' images')
+#                 print('Finished')
                 break
             download(item_id, url, args.images_dir)
-        print('Downloaded ' + str(len(next(os.walk(args.images_dir))[2])) + ' images')
     else:
         for class_name in args.classes:
             read_class(class_name, args.max_num_samples, url_dict, args.images_dir)
@@ -78,8 +79,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     main(args)
-    
-    print('Finished')
-    
+        
     exit(0)
     
