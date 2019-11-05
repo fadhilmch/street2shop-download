@@ -1,6 +1,5 @@
 #!/usr/bin/python
 
-from tomorrow import threads
 import os
 import sys
 import logging
