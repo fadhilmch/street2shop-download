@@ -2,7 +2,7 @@
 
 Downloader from [Street2Shop](http://www.tamaraberg.com/street2shop/) Image URLs
 
-<img src="/assets/screenrecord.gif" width="480">
+<img src="/assets/screenrecords.gif" width="480">
 
 # Requirements
 
@@ -18,9 +18,9 @@ $ curl http://www.tamaraberg.com/street2shop/wheretobuyit/photos.tar | tar x
 ```
 * Download and unzip class list
 ```sh
-curl -O http://www.tamaraberg.com/street2shop/wheretobuyit/meta.zip
-unzip meta.zip
-rm meta.zip
+$ curl -O http://www.tamaraberg.com/street2shop/wheretobuyit/meta.zip
+$ unzip meta.zip
+$ rm meta.zip
 ```
 
 # Usage
@@ -37,7 +37,7 @@ $ python download.py --urls photos/photos.txt
 $ python download.py --urls photos/photos.txt --classes bags pants tops
 ```
 
-* Running Options
+* Extra: Running Options
 ```sh
   --urls                  Path to urls list file [Required]
   --image_dir             Output images directory [default: /images/]
