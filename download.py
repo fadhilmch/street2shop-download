@@ -6,6 +6,7 @@ import logging
 import urllib.request
 import json
 from concurrent.futures.thread import ThreadPoolExecutor
+from progress.bar import Bar
 
 
 # download function on multi-threads
@@ -15,22 +16,21 @@ def download(item_id, url, images_dir):
     try:
         file_output = os.path.join(images_dir, str(item_id) + '.' + 'JPEG')
         urllib.request.urlretrieve(url, file_output)
-        print(file_output)
     except:
         print("Unexpected error:", sys.exc_info()[0])
         logging.error(sys.exc_info()[0])
 
 # Download images for each class
 def read_class(class_name, max_num_samples, url_dict, images_dir, threads):
-    print('Downloading images for class ' + class_name + '...')
     file_loc = 'meta/json/train_pairs_' + class_name + '.json'
     file_json = open(file_loc, 'r')
     meta_data = json.load(file_json)
     file_json.close()
-    images_list = []
+    images_list = [] 
+    bar = Bar('Downloading '+class_name.title(), max = (len(meta_data) if args.max_num_samples == None else args.max_num_samples), suffix='%(percent)d%%')
 
     for i,data in enumerate(meta_data):
-        if i >= max_num_samples:
+        if max_num_samples != None and i >= max_num_samples:
             break
         photo_id = int(data['photo'])
         url = url_dict[photo_id]
@@ -41,6 +41,8 @@ def read_class(class_name, max_num_samples, url_dict, images_dir, threads):
                 for x in images_list:
                     executor.submit(download, x['item_id'], x['url'], x['images_dir'])
                 images_list = []
+        bar.next()
+    bar.finish()
     print('Downloaded ' + str(len(next(os.walk(output_dir))[2])) + ' images for class ' + class_name)
     
 def main(args):    
@@ -57,10 +59,10 @@ def main(args):
     
     # Check whether we want to download all images or for specified class only
     if(args.classes[0] == 'all'):
-        print('Downloading all images...')
+        bar = Bar('Downloading all', max = (len(url_dict) if args.max_num_samples == None else args.max_num_samples), suffix='%(percent)d%%')
         images_list = []
         for i, (item_id, url) in enumerate(url_dict.items()):
-            if i >= args.max_num_samples:
+            if args.max_num_samples != None and i >= args.max_num_samples:
                 break
             images_list.append({'item_id': item_id, 'url': url, 'images_dir': args.images_dir})
             if i % args.threads == 0:
@@ -68,6 +70,8 @@ def main(args):
                     for x in images_list:
                         executor.submit(download, x['item_id'], x['url'], x['images_dir'])
                     images_list = []
+            bar.next()
+        bar.finish()
         print('Downloaded ' + str(len(next(os.walk(args.images_dir))[2])) + ' images')
             
     else:
@@ -85,7 +89,7 @@ if __name__ == '__main__':
     parser.add_argument('--start', dest='start', type=int, default=0, help='start offset')
     parser.add_argument('--threads', dest='threads', type=int, default=10, help='threads')
     parser.add_argument('--classes', nargs='+', dest='classes', type=str, default=['all'], help='specific fashion classes to download')
-    parser.add_argument('--max_num_samples', dest='max_num_samples', type=int, default=10000000, help='maximum number of samples')
+    parser.add_argument('--max_num_samples', dest='max_num_samples', type=int, default=None, help='maximum number of samples')
     args = parser.parse_args()
 
     main(args)
