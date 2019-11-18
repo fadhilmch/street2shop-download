@@ -21,8 +21,10 @@ def download(item_id, url, images_dir):
         logging.error(sys.exc_info()[0])
 
 # Download images for each class
+
+
 def read_class(class_name, max_num_samples, url_dict, images_dir, threads):
-    file_loc = 'meta/json/retrieval_' + class_name + '.json'
+    file_loc = 'meta/json/train_pairs_' + class_name + '.json'
     file_json = open(file_loc, 'r')
     meta_data = json.load(file_json)
     file_json.close()
