@@ -1,8 +1,8 @@
 # Street2Shop Dataset Downloader
 
-Downloader from [Street2Shop](http://www.tamaraberg.com/street2shop/) Image URLs
+Downloader for [Street2Shop](http://www.tamaraberg.com/street2shop/) Dataset
 
-<img src="/assets/screenrecords.gif" width="480">
+<img src="/assets/street2shop.jpg" width="480">
 
 # Requirements
 
@@ -24,6 +24,8 @@ $ rm meta.zip
 ```
 
 # Usage
+
+<img src="/assets/screenrecords.gif" width="480">
 
 * Option 1: Download all images from URL list
 
