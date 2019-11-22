@@ -30,7 +30,7 @@ def read_class(class_name, max_num_samples, url_dict, images_dir, threads):
     file_json.close()
     images_list = []
     bar = Bar('Downloading '+class_name.title(), max=(len(meta_data)
-                                                      if args.max_num_samples == None else args.max_num_samples), suffix='%(percent)d%%')
+                                                      if (args.max_num_samples == None) or (args.max_num_samples > len(meta_data)) else args.max_num_samples), suffix='%(percent)d%%')
 
     for i, data in enumerate(meta_data):
         if max_num_samples != None and i >= max_num_samples:
