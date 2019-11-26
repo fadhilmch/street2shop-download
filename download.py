@@ -7,17 +7,24 @@ import urllib.request
 import json
 from concurrent.futures.thread import ThreadPoolExecutor
 from progress.bar import Bar
+import cv2
 
 
 # download function on multi-threads
-def download(item_id, url, images_dir):
+def download(item_id, url, images_dir, bbox, crop):
     if not os.path.exists(images_dir):
         os.makedirs(images_dir)
     try:
         file_output = os.path.join(images_dir, str(item_id) + '.' + 'JPEG')
         urllib.request.urlretrieve(url, file_output)
+        if(cropped):
+            image = cv2.imread(file_output)
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            cropped = image[bbox['top']:bbox['top'] + bbox['height'],
+                            bbox['left']: bbox['left'] + bbox['width']]
+            cv2.imwrite(file_output, cropped)
     except:
-        print("Unexpected error:", sys.exc_info()[0])
+        # print("Unexpected error:", sys.exc_info()[0])
         logging.error(sys.exc_info()[0])
 
 # Download images for each class
@@ -37,14 +44,15 @@ def read_class(class_name, max_num_samples, url_dict, images_dir, threads):
             break
         photo_id = int(data['photo'])
         url = url_dict[photo_id]
+        bbox = data['bbox']
         output_dir = os.path.join(images_dir, class_name)
         images_list.append(
-            {'item_id': photo_id, 'url': url, 'images_dir': output_dir})
+            {'item_id': photo_id, 'url': url, 'images_dir': output_dir, 'bbox': bbox})
         if i % args.threads == 0:
             with ThreadPoolExecutor(max_workers=args.threads) as executor:
                 for x in images_list:
                     executor.submit(
-                        download, x['item_id'], x['url'], x['images_dir'])
+                        download, x['item_id'], x['url'], x['images_dir'], x['bbox'], args.crop)
                 images_list = []
         bar.next()
     bar.finish()
@@ -110,6 +118,8 @@ if __name__ == '__main__':
                         default=['all'], help='specific fashion classes to download')
     parser.add_argument('--max_num_samples', dest='max_num_samples',
                         type=int, default=None, help='maximum number of samples')
+    parser.add_argument('--crop', dest='crop',
+                        type=int, default=None, help='crop image based on given bounding box')
     args = parser.parse_args()
 
     main(args)
