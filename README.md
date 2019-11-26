@@ -30,13 +30,13 @@ $ rm meta.zip
 * Option 1: Download all images from URL list
 
 ```sh
-$ python download.py --urls photos/photos.txt 
+$ python download.py --urls photos/photos.txt --crop
 ```
 
 * Option 2: Download images per class from URL list 
 
 ```sh
-$ python download.py --urls photos/photos.txt --classes bags pants tops
+$ python download.py --urls photos/photos.txt --classes bags pants tops --crop
 ```
 
 * Extra: Running Options
@@ -47,4 +47,5 @@ $ python download.py --urls photos/photos.txt --classes bags pants tops
   --threads               Number of threads to execute [default: 10]
   --classes               Download images per class
   --max_num_samples       Maximum number of files to download
+  --crop                  Crop each image using the bounding box data
 ```
