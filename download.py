@@ -5,9 +5,9 @@ import sys
 import logging
 import urllib.request
 import json
+import cv2
 from concurrent.futures.thread import ThreadPoolExecutor
 from progress.bar import Bar
-import cv2
 
 
 # download function on multi-threads
@@ -19,12 +19,11 @@ def download(item_id, url, images_dir, bbox, crop):
         urllib.request.urlretrieve(url, file_output)
         if(crop):
             image = cv2.imread(file_output)
-            # image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             cropped = image[bbox['top']:bbox['top'] + bbox['height'],
                             bbox['left']: bbox['left'] + bbox['width']]
             cv2.imwrite(file_output, cropped)
     except:
-        print("Unexpected error:", sys.exc_info()[0])
+        # print("Unexpected error:", sys.exc_info()[0])
         logging.error(sys.exc_info()[0])
 
 # Download images for each class
