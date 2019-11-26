@@ -119,7 +119,7 @@ if __name__ == '__main__':
     parser.add_argument('--max_num_samples', dest='max_num_samples',
                         type=int, default=None, help='maximum number of samples')
     parser.add_argument('--crop', dest='crop',
-                        type=int, default=None, help='crop image based on given bounding box')
+                        action='store_true', help='crop image based on given bounding box')
     args = parser.parse_args()
 
     main(args)
