@@ -8,6 +8,7 @@ import json
 import cv2
 from concurrent.futures.thread import ThreadPoolExecutor
 from progress.bar import Bar
+from PIL import Image
 
 
 # download function on multi-threads
@@ -17,14 +18,29 @@ def download(item_id, url, images_dir, bbox, crop):
     try:
         file_output = os.path.join(images_dir, str(item_id) + '.' + 'JPEG')
         urllib.request.urlretrieve(url, file_output)
-        if(crop):
-            image = cv2.imread(file_output)
-            cropped = image[bbox['top']:bbox['top'] + bbox['height'],
-                            bbox['left']: bbox['left'] + bbox['width']]
-            cv2.imwrite(file_output, cropped)
+        if (verify_image(file_output)):
+            if(crop):
+                image = cv2.imread(file_output)
+                cropped = image[bbox['top']:bbox['top'] + bbox['height'],
+                                bbox['left']: bbox['left'] + bbox['width']]
+                cv2.imwrite(file_output, cropped)
+        else:
+            os.remove(file_output)
+            print('Remove '+file_output)
     except:
         # print("Unexpected error:", sys.exc_info()[0])
         logging.error(sys.exc_info()[0])
+
+# Function to verify image
+
+
+def verify_image(image_file):
+    try:
+        img = Image.open(image_file)
+        img.verify()
+    except:
+        return False
+    return True
 
 # Download images for each class
 
