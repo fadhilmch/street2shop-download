@@ -89,36 +89,15 @@ def main(args):
                      for line in url_list])
     f.close()
 
-    # Check whether we want to download all images or for specified class only
-    if(args.classes[0] == 'all'):
-        bar = Bar('Downloading all', max=(len(url_dict) if args.max_num_samples ==
-                                          None else args.max_num_samples), suffix='%(percent)d%%')
-        images_list = []
-        for i, (item_id, url) in enumerate(url_dict.items()):
-            if args.max_num_samples != None and i >= args.max_num_samples:
-                break
-            images_list.append(
-                {'item_id': item_id, 'url': url, 'images_dir': args.images_dir})
-            if i % args.threads == 0:
-                with ThreadPoolExecutor(max_workers=args.threads) as executor:
-                    for x in images_list:
-                        executor.submit(
-                            download, x['item_id'], x['url'], x['images_dir'])
-                    images_list = []
-            bar.next()
-        bar.finish()
-        print('Downloaded ' +
-              str(len(next(os.walk(args.images_dir))[2])) + ' images')
-
-    else:
-        for class_name in args.classes:
-            read_class(class_name, args.max_num_samples,
-                       url_dict, args.images_dir, args.threads)
+    for class_name in args.classes:
+        read_class(class_name, args.max_num_samples,
+                   url_dict, args.images_dir, args.threads)
 
 
 if __name__ == '__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser()
+    all_classes = ['bags','belts','dresses','eyewear','footwear','hats','leggings','outerwear','pants','skirts','tops']
 
     # Data handling parameters
     parser.add_argument('--urls', dest='urls', type=str,
@@ -130,7 +109,7 @@ if __name__ == '__main__':
     parser.add_argument('--threads', dest='threads',
                         type=int, default=10, help='threads')
     parser.add_argument('--classes', nargs='+', dest='classes', type=str,
-                        default=['all'], help='specific fashion classes to download')
+                        default=all_classes, help='specific fashion classes to download')
     parser.add_argument('--max_num_samples', dest='max_num_samples',
                         type=int, default=None, help='maximum number of samples')
     parser.add_argument('--crop', dest='crop',
