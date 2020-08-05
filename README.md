@@ -39,10 +39,17 @@ $ python download.py --urls photos/photos.txt --crop
 $ python download.py --urls photos/photos.txt --classes bags pants tops --crop
 ```
 
+* Option 3: Download only the shop images that have a matching street image
+```sh
+$ python download.py --urls photos/photos.txt --domains shop --match
+```
+
 * Extra: Running Options
 ```sh
   --urls                  Path to urls list file [Required]
   --image_dir             Output images directory [default: /images/]
+  --domains               Specific one or more photo domains to download. Allowed domains are: street, shop [default: street]
+  --match                 Only download the shop photos that have a matching street photo if the shop domain is specified
   --log                   Path to log file
   --threads               Number of threads to execute [default: 10]
   --classes               Download images per class
