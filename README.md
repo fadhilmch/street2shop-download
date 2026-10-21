@@ -93,7 +93,7 @@ The previous release scraped image URLs from the offline `tamaraberg.com` files.
 
 ## License and citation
 
-The dataset remains subject to the original Street2Shop terms: research use only, and cite the ICCV 2015 paper:
+This repository only contains the exporter code. The dataset itself comes from the original authors and the Hugging Face copy, and this README does not grant any rights to it. Check the [original project page](https://web.archive.org/web/2019/http://tamaraberg.com/street2shop/) and the Hugging Face dataset page for terms of use, and cite the ICCV 2015 paper if you use the data:
 
 > Kiapour, Han, Lazebnik, Berg, Berg. *Where to Buy It: Matching Street Clothing Photos in Online Shops.* ICCV 2015.
 
