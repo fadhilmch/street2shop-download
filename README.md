@@ -14,8 +14,6 @@ $ pip install -r requirements.txt
 
 # Usage
 
-<img src="/assets/screenrecords.gif" width="480">
-
 * Option 1: Export the full dataset (all categories, both splits)
 
 ```sh
