@@ -1,44 +1,26 @@
-MANIFEST
-build
-dist
-_build
-docs/man/*.gz
-docs/source/api/generated
-docs/source/config.rst
-docs/gh-pages
-notebook/i18n/*/LC_MESSAGES/*.mo
-notebook/i18n/*/LC_MESSAGES/nbjs.json
-notebook/static/components
-notebook/static/style/*.min.css*
-notebook/static/*/js/built/
-notebook/static/*/built/
-notebook/static/built/
-notebook/static/*/js/main.min.js*
-notebook/static/lab/*bundle.js
-node_modules
-*.py[co]
-__pycache__
-*.egg-info
-*~
-*.bak
-.ipynb_checkpoints
-.tox
-.DS_Store
-\#*#
-.#*
+# Exporter output (the dataset is never committed)
+images/
+meta/
+export_report.json
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+
+# Virtual environments
+.venv/
+venv/
+
+# Test and tool caches
+.pytest_cache/
 .coverage
-.pytest_cache
-src
+.ruff_cache/
 
-*.swp
-*.map
+# Editors and OS
 .idea/
-Read the Docs
-config.rst
-*.iml
-/.project
-/.pydevproject
-
-package-lock.json
-geckodriver.log
-*.iml
+.vscode/
+*.swp
+.DS_Store
