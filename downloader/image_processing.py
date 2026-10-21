@@ -1,97 +1,48 @@
-import logging
-import os
-import urllib.request
+"""Image helpers for the Street2Shop exporter.
 
-import cv2
-from PIL import Image
+Only Pillow is required. The bounding-box format matches the original
+Street2Shop metadata: {"width": w, "top": y, "left": x, "height": h}.
+"""
+
+BBOX_KEYS = ("width", "top", "left", "height")
 
 
-def create_dir(directory: str) -> None:
+def validate_bbox(bbox):
+    """Return a bbox as plain ints, or raise ValueError.
+
+    The Hugging Face copy stores bbox fields as float32; the original
+    JSON files use ints, so values are rounded to the nearest int.
     """
-    Create a directory if it does not exist
-
-    Args:
-        directory: str, path to the directory
-    """
-    if not os.path.exists(directory):
-        os.makedirs(directory)
-
-
-def download_image(url: str, output_path: str) -> None:
-    """
-    Downloads an image from the specified URL and saves it to the given output path.
-    Args:
-        url (str): The URL of the image to download.
-        output_path (str): The local file path where the downloaded image will be saved.
-    Raises:
-        Exception: If there is an error during the download process, it will be logged.
-    """
-
+    if not isinstance(bbox, dict):
+        raise ValueError(f"bbox must be a mapping, got {type(bbox).__name__}")
+    missing = [k for k in BBOX_KEYS if k not in bbox]
+    if missing:
+        raise ValueError(f"bbox missing keys: {', '.join(missing)}")
     try:
-        urllib.request.urlretrieve(url, output_path)
-    except Exception as e:
-        logging.error(f"Error downloading image from {url}: {e}")
+        normalized = {k: int(round(float(bbox[k]))) for k in BBOX_KEYS}
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"bbox values must be numeric: {exc}") from exc
+    if normalized["width"] <= 0 or normalized["height"] <= 0:
+        raise ValueError(
+            f"bbox width/height must be positive, got "
+            f"{normalized['width']}x{normalized['height']}"
+        )
+    return normalized
 
 
-def verify_image(image_file: str) -> bool:
+def crop_to_bbox(image, bbox):
+    """Crop a PIL image to the bbox, clamped to the image bounds.
+
+    Returns a new image. Raises ValueError when the bbox is invalid or
+    lies fully outside the image.
     """
-    Verifies if the given image file is a valid image.
-
-    This function attempts to open and verify the image file using the PIL library.
-    If the image is valid, the function returns True. If an error occurs during
-    verification, the function logs the error and returns False.
-
-    Args:
-        image_file (str): The path to the image file to be verified.
-
-    Returns:
-        bool: True if the image is valid, False otherwise.
-    """
-    try:
-        img = Image.open(image_file)
-        img.verify()
-    except Exception as e:
-        logging.error(f"Error verifying image {image_file}: {e}")
-        return False
-    return True
-
-
-def crop_image(image_file: str, bbox: dict) -> None:
-    """
-    Crops an image based on the provided bounding box coordinates.
-
-    This function reads the image file using OpenCV, crops the image based on the
-    bounding box coordinates, and overwrites the original image file with the cropped version.
-
-    Args:
-        image_file (str): The path to the image file to be cropped.
-        bbox (dict): A dictionary containing the bounding box coordinates with keys 'top', 'left', 'height', and 'width'.
-    """
-    image = cv2.imread(image_file)
-    cropped = image[
-        bbox["top"] : bbox["top"] + bbox["height"],
-        bbox["left"] : bbox["left"] + bbox["width"],
-    ]
-    cv2.imwrite(image_file, cropped)
-
-
-def verify_image_and_crop(file_path: str, bbox: dict, crop: bool) -> None:
-    """
-    Verifies the integrity of an image file and optionally crops it based on the provided bounding box.
-
-    Args:
-        file_path (str): The path to the image file to be verified and potentially cropped.
-        bbox (dict): A dictionary containing the bounding box coordinates with keys 'top', 'left', 'height', and 'width'.
-        crop (bool): A flag indicating whether to crop the image if it is verified successfully.
-
-    Side Effects:
-        - Removes the image file if it fails verification.
-        - Logs an error message if the image file is removed.
-        - Overwrites the image file with the cropped version if cropping is enabled.
-    """
-    if not verify_image(file_path):
-        os.remove(file_path)
-        logging.error(f"Removed {file_path}")
-    else:
-        if crop:
-            crop_image(file_path, bbox)
+    box = validate_bbox(bbox)
+    left = max(0, box["left"])
+    top = max(0, box["top"])
+    right = min(image.width, box["left"] + box["width"])
+    bottom = min(image.height, box["top"] + box["height"])
+    if right <= left or bottom <= top:
+        raise ValueError(
+            f"bbox {box} does not intersect image of size {image.size}"
+        )
+    return image.crop((left, top, right, bottom))
